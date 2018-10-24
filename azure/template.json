@@ -23,7 +23,7 @@
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-    "appServiceName": "[concat('dfc-',toLower(parameters('environmentName')),'-providerportal-lars-learningdelivery-web')]"
+    "appServiceName": "[concat('dfc-',toLower(parameters('environmentName')),'-providerportal-lld-web')]"
   },
   "resources": [
     {
