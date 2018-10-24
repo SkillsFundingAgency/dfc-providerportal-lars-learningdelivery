@@ -84,7 +84,7 @@
   "outputs": {
     "appServiceName": {
       "type": "string",
-      "value": "[variables('appServiceName')]"
+      "value": "[variables('functionAppName')]"
     },
     "appInsightInstrumentationKey": {
       "type": "string",
