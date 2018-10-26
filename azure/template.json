@@ -74,6 +74,10 @@
               {
                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                 "value": "[reference('pplldAppInsights').outputs.InstrumentationKey.value]"
+              },
+              {
+                "name": "FUNCTIONS_EXTENSION_VERSION",
+                "value": "~2"
               }
             ]
           }
