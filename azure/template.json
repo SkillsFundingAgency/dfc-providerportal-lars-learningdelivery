@@ -24,7 +24,7 @@
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
     "functionAppName": "[concat('dfc-',toLower(parameters('environmentName')),'-providerportal-lld-fa')]",
-    "functionStorageName": "[concat('dfc-',toLower(parameters('environmentName')),'-providerportal-lld-fa')]"
+    "functionStorageName": "[concat('dfc',toLower(parameters('environmentName')),'providerportallldstr')]"
   },
   "resources": [{
       "apiVersion": "2017-05-10",
