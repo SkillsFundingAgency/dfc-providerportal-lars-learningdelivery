@@ -23,10 +23,10 @@
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-    "functionAppName": "[concat('dfc-',toLower(parameters('environmentName')),'-providerportal-lld-fa')]"
+    "functionAppName": "[concat('dfc-',toLower(parameters('environmentName')),'-providerportal-lld-fa')]",
+    "functionStorageName": "[concat('dfc-',toLower(parameters('environmentName')),'-providerportal-lld-fa')]"
   },
-  "resources": [
-    {
+  "resources": [{
       "apiVersion": "2017-05-10",
       "name": "pplldAppInsights",
       "type": "Microsoft.Resources/deployments",
@@ -51,7 +51,8 @@
       "name": "pplldAppService",
       "type": "Microsoft.Resources/deployments",
       "dependsOn": [
-        "pplldAppInsights"
+        "pplldAppInsights",
+        "pplldStorage"
       ],
       "properties": {
         "mode": "Incremental",
@@ -70,16 +71,36 @@
             "value": "[parameters('appServicePlanResourceGroup')]"
           },
           "functionAppAppSettings": {
-            "value": [
-              {
+            "value": [{
                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                 "value": "[reference('pplldAppInsights').outputs.InstrumentationKey.value]"
               },
               {
                 "name": "FUNCTIONS_EXTENSION_VERSION",
                 "value": "~2"
+              },
+              {
+                "name": "AzureWebJobsStorage",
+                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('functionStorageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('functionStorageName')), '2015-05-01-preview').key1)]"
               }
             ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "pplldStorage",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('functionStorageName')]"
           }
         }
       }
@@ -89,6 +110,10 @@
     "appServiceName": {
       "type": "string",
       "value": "[variables('functionAppName')]"
+    },
+    "storageAccountNAme": {
+      "type": "string",
+      "value": "[variables('functionStorageName')]"
     },
     "appInsightInstrumentationKey": {
       "type": "string",
