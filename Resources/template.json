@@ -2,16 +2,16 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "environmentName": {
+    "functionAppPrefix": {
       "type": "string",
       "metadata": {
-        "description": "Short name of the environment. Used for the name of resources created"
+        "description": "Prefix for the function app resources, in the form dfc-env-proj-fnapp"
       }
     },
     "appServicePlanName": {
       "type": "string",
       "metadata": {
-        "description": "App service plan to run the app under"
+        "description": "App service plan to run the function app under"
       }
     },
     "appServicePlanResourceGroup": {
@@ -19,12 +19,18 @@
       "metadata": {
         "description": "Resource group the app service plan is in"
       }
+    },
+    "storageConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Connection string for the storage account to store function app "
+      }
     }
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-    "functionAppName": "[concat('dfc-',toLower(parameters('environmentName')),'-providerportal-lld-fa')]",
-    "functionStorageName": "[concat('dfc',toLower(parameters('environmentName')),'provporlldstr')]"
+    "functionAppName": "[concat(parameters('functionAppPrefix'),'-fa')]",
+    "appInsightName": "[concat(parameters('functionAppPrefix'),'-ai')]"
   },
   "resources": [{
       "apiVersion": "2017-05-10",
@@ -38,7 +44,7 @@
         },
         "parameters": {
           "appInsightsName": {
-            "value": "[variables('functionAppName')]"
+            "value": "[variables('appInsightName')]"
           },
           "attachedService": {
             "value": "[variables('functionAppName')]"
@@ -51,8 +57,7 @@
       "name": "pplldAppService",
       "type": "Microsoft.Resources/deployments",
       "dependsOn": [
-        "pplldAppInsights",
-        "pplldStorage"
+        "pplldAppInsights"
       ],
       "properties": {
         "mode": "Incremental",
@@ -81,39 +86,22 @@
               },
               {
                 "name": "AzureWebJobsStorage",
-                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('functionStorageName'),';AccountKey=',reference('pplldStorage').outputs.storageKey.value)]"
+                "value": "[parameters('storageConnectionString')]"
               }
             ]
-          }
-        }
-      }
-    },
-    {
-      "apiVersion": "2017-05-10",
-      "name": "pplldStorage",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "storageAccountName": {
-            "value": "[variables('functionStorageName')]"
           }
         }
       }
     }
   ],
   "outputs": {
-    "appServiceName": {
+    "functionAppName": {
       "type": "string",
       "value": "[variables('functionAppName')]"
     },
-    "storageAccountNAme": {
+    "appInsightName": {
       "type": "string",
-      "value": "[variables('functionStorageName')]"
+      "value": "[variables('appInsightName')]"
     },
     "appInsightInstrumentationKey": {
       "type": "string",
